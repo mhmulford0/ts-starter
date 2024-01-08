@@ -7,9 +7,8 @@ import { client, NounsGovInstance, sleep } from "./utils.js";
 async function getContractEvents() {
   /*  
     Alchemy allows up to 2000 blocks per request
-    setting the limit just under to avoid rate limits
   */
-  const STEP_SIZE = 1900n;
+  const STEP_SIZE = 2000n;
 
   const blkNum = await client.getBlockNumber();
 
@@ -19,6 +18,7 @@ async function getContractEvents() {
     target to end of the provider block limit
   */
   let fromBlock = 12985453n;
+  // let fromBlock = 17998594n;
   let toBlock = fromBlock + STEP_SIZE;
 
   const gov = NounsGovInstance();
@@ -29,7 +29,8 @@ async function getContractEvents() {
         fromBlock: fromBlock,
         toBlock: toBlock,
       });
-      const propCreated = await gov.getEvents.ProposalCreatedWithRequirements({
+
+      const propCreated = await gov.getEvents.ProposalCreated({
         fromBlock: fromBlock,
         toBlock: toBlock,
       });
@@ -40,18 +41,20 @@ async function getContractEvents() {
 
       propCreated.forEach(async ({ args }) => {
         console.log("prop inserted: ");
-        console.log({ args });
-        if (args.id && args.proposer && args.quorumVotes && args.description) {
-          await db.insert(proposals).values({
-            id: Number(args.id),
-            description: args.description,
-            proposer: args.proposer,
-            quorumVotes: Number(args.quorumVotes),
-            startBlock: Number(args.startBlock),
-            endBlock: Number(args.endBlock),
-            proposalThreshold: Number(args.proposalThreshold),
-          });
-        }
+        console.log({
+          id: args.id,
+          proposer: args.proposer,
+          endblock: args.endBlock,
+          desc: args.description?.substring(0, 250),
+        });
+
+        await db.insert(proposals).values({
+          id: Number(args.id),
+          description: args.description,
+          proposer: args.proposer,
+          startBlock: Number(args.startBlock),
+          endBlock: Number(args.endBlock),
+        });
       });
       voteCast.forEach(async ({ args }) => {
         await db.insert(votes).values({
@@ -66,18 +69,17 @@ async function getContractEvents() {
 
       propExecuted.forEach(async (p) => {
         console.log(Number(p.args.id), "prop executed");
-        if (p.args.id) {
-          await db
-            .update(proposals)
-            .set({ executed: true })
-            .where(eq(proposals.id, Number(p.args.id)));
-        }
+
+        await db
+          .update(proposals)
+          .set({ executed: true })
+          .where(eq(proposals.id, Number(p.args.id)));
       });
 
       fromBlock = toBlock + 1n;
       toBlock = fromBlock + STEP_SIZE;
 
-      await sleep(90);
+      await sleep(60);
     } catch (e: unknown) {
       console.log({ e });
     }
