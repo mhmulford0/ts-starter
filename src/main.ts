@@ -34,12 +34,13 @@ async function getContractEvents() {
         fromBlock: fromBlock,
         toBlock: toBlock,
       });
+
       const propExecuted = await gov.getEvents.ProposalExecuted({
         fromBlock: fromBlock,
         toBlock: toBlock,
       });
 
-      propCreated.forEach(async ({ args }) => {
+      for (const { args } of propCreated) {
         console.log("prop inserted: ");
         console.log({
           id: args.id,
@@ -55,8 +56,9 @@ async function getContractEvents() {
           startBlock: Number(args.startBlock),
           endBlock: Number(args.endBlock),
         });
-      });
-      voteCast.forEach(async ({ args }) => {
+      }
+
+      for (const { args } of voteCast) {
         await db.insert(votes).values({
           id: nanoid(),
           voter: args.voter as string,
@@ -65,16 +67,15 @@ async function getContractEvents() {
           votes: Number(args.votes),
           reason: args.reason,
         });
-      });
+      }
 
-      propExecuted.forEach(async (p) => {
-        console.log(Number(p.args.id), "prop executed");
-
+      for (const { args } of propExecuted) {
+        console.log(Number(args.id), "prop executed");
         await db
           .update(proposals)
           .set({ executed: true })
-          .where(eq(proposals.id, Number(p.args.id)));
-      });
+          .where(eq(proposals.id, Number(args.id)));
+      }
 
       fromBlock = toBlock + 1n;
       toBlock = fromBlock + STEP_SIZE;
