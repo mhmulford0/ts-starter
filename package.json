@@ -7,9 +7,9 @@
     "build": "tsc",
     "start": "tsc && node ./dist/main.js",
     "dev": "tsx watch ./src/main.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "npx drizzle-kit generate:sqlite",
-    "push": "npx drizzle-kit push:sqlite"
+    "push": "npx drizzle-kit push:sqlite",
+    "db:reset": "rm ./src/db/sqlite.db && npm run migrate && npm run push"
   },
   "keywords": [],
   "author": "mulf",
@@ -25,6 +25,7 @@
     "better-sqlite3": "^9.2.2",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.3",
+    "nanoid": "^5.0.4",
     "viem": "^2.0.0"
   }
 }

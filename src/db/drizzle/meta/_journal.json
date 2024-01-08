@@ -8,6 +8,62 @@
       "when": 1704678717499,
       "tag": "0000_typical_the_call",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1704680522208,
+      "tag": "0001_goofy_lionheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704680789813,
+      "tag": "0002_mighty_lester",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1704680815600,
+      "tag": "0003_flowery_the_hood",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1704681685824,
+      "tag": "0004_confused_the_hand",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1704682040642,
+      "tag": "0005_romantic_miss_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1704682811419,
+      "tag": "0006_romantic_baron_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1704683046751,
+      "tag": "0007_concerned_sebastian_shaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1704683744307,
+      "tag": "0008_clean_blue_marvel",
+      "breakpoints": true
     }
   ]
 }

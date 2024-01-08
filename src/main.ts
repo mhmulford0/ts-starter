@@ -1,4 +1,7 @@
-import { db, proposals } from "./db/schema.js";
+import { eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
+
+import { db, proposals, votes } from "./db/schema.js";
 import { client, NounsGovInstance, sleep } from "./utils.js";
 
 async function getContractEvents() {
@@ -34,36 +37,45 @@ async function getContractEvents() {
         fromBlock: fromBlock,
         toBlock: toBlock,
       });
-      console.log(`start: ${fromBlock}, end: ${toBlock}`);
 
       propCreated.forEach(async ({ args }) => {
-        if (
-          args.id &&
-          args.proposer &&
-          args.quorumVotes &&
-          args.proposalThreshold &&
-          args.description
-        ) {
+        console.log("prop inserted: ");
+        console.log({ args });
+        if (args.id && args.proposer && args.quorumVotes && args.description) {
           await db.insert(proposals).values({
-            id: args.id,
+            id: Number(args.id),
             description: args.description,
             proposer: args.proposer,
-            quorumVotes: args.quorumVotes,
-            proposalThreshold: args.proposalThreshold,
+            quorumVotes: Number(args.quorumVotes),
+            startBlock: Number(args.startBlock),
+            endBlock: Number(args.endBlock),
+            proposalThreshold: Number(args.proposalThreshold),
           });
         }
       });
-      voteCast.forEach((v) => console.log(v.args));
-      propExecuted.forEach((p) => console.log(p.args));
+      voteCast.forEach(async ({ args }) => {
+        await db.insert(votes).values({
+          id: nanoid(),
+          voter: args.voter as string,
+          proposalId: Number(args.proposalId),
+          support: Number(args.support),
+          votes: Number(args.votes),
+          reason: args.reason,
+        });
+      });
+
+      propExecuted.forEach(async (p) => {
+        console.log(Number(p.args.id), "prop executed");
+        if (p.args.id) {
+          await db
+            .update(proposals)
+            .set({ executed: true })
+            .where(eq(proposals.id, Number(p.args.id)));
+        }
+      });
 
       fromBlock = toBlock + 1n;
       toBlock = fromBlock + STEP_SIZE;
-
-      console.log("-------------------------------- \n");
-
-      if (toBlock - fromBlock !== 1900n) {
-        console.error("your math is wrong");
-      }
 
       await sleep(90);
     } catch (e: unknown) {

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `proposals_id_unique` ON `proposals` (`id`);
